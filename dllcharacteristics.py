@@ -8,4 +8,14 @@ NX_COMPAT = 0x0100
 
 pe = pefile.PE('test.exe')
 
-print(pe.OPTIONAL_HEADER.DllCharacteristics)
+def get_characteristic(char_value, char_name):
+    status = 'OFF'
+    if pe.OPTIONAL_HEADER.DllCharacteristics & char_value != 0:
+        status = 'ON'
+
+    print(char_name + ': ' + status)
+
+get_characteristic(DYNAMIC_BASE, "DYNAMIC_BASE")
+get_characteristic(FORCE_INTEGRITY, "FORCE_INTEGRITY")
+get_characteristic(NX_COMPAT, "NX_COMPAT")
+
