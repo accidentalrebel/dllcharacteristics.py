@@ -28,15 +28,19 @@ def get_all_characteristics():
     print('FORCE_INTEGRITY: '+ get_characteristic(FORCE_INTEGRITY))
     print('NX_COMPAT: ' + get_characteristic(NX_COMPAT))
 
-def handle_characteristic(characteristic, arg_value):
+def handle_characteristic(characteristic, arg_value, can_output):
     if arg_value == None:
         print(get_characteristic(characteristic))
+        return
     elif arg_value == '1':
         print('Setting to on...')
         set_characteristic(characteristic, True)
     elif arg_value == '0':
         print('Setting to off...')
         set_characteristic(characteristic, False)
+
+    if can_output:
+        print('Output placeholder...')
 
 def main():
     parser = ArgumentParser(description='Gets or sets DLL characteristics of PE files.')
@@ -64,7 +68,10 @@ def main():
     parser.add_argument('-a',
                         '--all',
                         action='store_true',
-	                help='Displayt he values of all DLL characteristics.')
+	                help='Display the values of all DLL characteristics.')
+    parser.add_argument('-o',
+                        '--output',
+                        help='Output file to write changes to.')
 
     args = parser.parse_args()
     print(args)
@@ -72,12 +79,12 @@ def main():
     get_all_characteristics()
 
     if args.dynamicbase != 'default':
-        handle_characteristic(DYNAMIC_BASE, args.dynamicbase)
-    elif  args.nxcompat != 'default':
-        handle_characteristic(NX_COMPAT, args.nxcompat)
-    elif args.forceintegrity != 'default':
-        handle_characteristic(FORCE_INTEGRITY, args.forceintegrity)
-    elif args.all:
+        handle_characteristic(DYNAMIC_BASE, args.dynamicbase, args.output)
+    if  args.nxcompat != 'default':
+        handle_characteristic(NX_COMPAT, args.nxcompat, args.output)
+    if args.forceintegrity != 'default':
+        handle_characteristic(FORCE_INTEGRITY, args.forceintegrity, args.output)
+    if args.all:
         get_all_characteristics()
 
     get_all_characteristics()
