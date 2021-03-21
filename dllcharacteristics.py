@@ -7,11 +7,16 @@ DYNAMIC_BASE = 0x0040
 FORCE_INTEGRITY = 0x0080
 NX_COMPAT = 0x0100
 
-parser = ArgumentParser(description='.')
-parser.add_argument('-o',
-	'--output',
-	help='Set output exe file.')
+parser = ArgumentParser(description='Gets or sets DLL characteristics of PE files.')
+parser.add_argument('-d',
+                    '--dynamic',
+                    choices={'on' ,'off'},
+                    nargs='?',
+                    action='store',
+	            help='Set DYNAMIC_BASE (ASLR) to value on or off. Displays current value if no parameter is specified.')
+
 args = parser.parse_args()
+print(args.dynamic)
 
 pe = pefile.PE('test.exe')
 
