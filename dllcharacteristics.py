@@ -17,6 +17,12 @@ def get_characteristic(char_value):
 
     return status
 
+def set_characteristic(char_value, status):
+    if status:
+        pe.OPTIONAL_HEADER.DllCharacteristics |= char_value
+    else:
+        pe.OPTIONAL_HEADER.DllCharacteristics &= ~char_value
+
 def get_all_characteristics():
     print('DYNAMIC_BASE: ' + get_characteristic(DYNAMIC_BASE))
     print('FORCE_INTEGRITY: '+ get_characteristic(FORCE_INTEGRITY))
@@ -27,8 +33,10 @@ def handle_characteristic(characteristic, arg_value):
         print(get_characteristic(characteristic))
     elif arg_value == '1':
         print('Setting to on...')
+        set_characteristic(characteristic, True)
     elif arg_value == '0':
         print('Setting to off...')
+        set_characteristic(characteristic, False)
 
 def main():
     parser = ArgumentParser(description='Gets or sets DLL characteristics of PE files.')
@@ -61,14 +69,18 @@ def main():
     args = parser.parse_args()
     print(args)
 
+    get_all_characteristics()
+
     if args.dynamicbase != 'default':
         handle_characteristic(DYNAMIC_BASE, args.dynamicbase)
-    elif args.nxcompat != 'default':
+    elif  args.nxcompat != 'default':
         handle_characteristic(NX_COMPAT, args.nxcompat)
     elif args.forceintegrity != 'default':
         handle_characteristic(FORCE_INTEGRITY, args.forceintegrity)
     elif args.all:
         get_all_characteristics()
+
+    get_all_characteristics()
 
 if __name__ == '__main__':
     main()
