@@ -22,19 +22,48 @@ def get_all_characteristics():
     get_characteristic(FORCE_INTEGRITY, "FORCE_INTEGRITY")
     get_characteristic(NX_COMPAT, "NX_COMPAT")
 
+def handle_characteristic(characteristic):
+    print('handle')
+
 def main():
     parser = ArgumentParser(description='Gets or sets DLL characteristics of PE files.')
     parser.add_argument('-d',
-                        '--dynamic',
+                        '--dynamicbase',
                         choices={'on' ,'off'},
                         nargs='?',
+                        default='default',
                         action='store',
 	                help='Set DYNAMIC_BASE (ASLR) to value on or off. Displays current value if no parameter is specified.')
+    parser.add_argument('-n',
+                        '--nxcompat',
+                        choices={'on' ,'off'},
+                        nargs='?',
+                        default='default',
+                        action='store',
+	                help='Set NX_COMPAT (DEP) to value on or off. Displays current value if no parameter is specified.')
+    parser.add_argument('-f',
+                        '--forceintegrity',
+                        choices={'on' ,'off'},
+                        default='default',
+                        nargs='?',
+                        action='store',
+	                help='Set FORCE_INTEGRITY (check signaturue) to value on or off. Displays current value if no parameter is specified.')
+    parser.add_argument('-a',
+                        '--all',
+                        action='store_true',
+	                help='Displayt he values of all DLL characteristics.')
 
     args = parser.parse_args()
-    print(args.dynamic)
+    print(args)
 
-    get_all_characteristics()
+    if args.dynamicbase:
+        handle_characteristic(DYNAMIC_BASE)
+    elif args.nxcompat:
+        handle_characteristic(NX_COMPAT)
+    elif args.forceintegrity:
+        handle_characteristic(FORCE_INTEGRITY)
+    elif args.all:
+        get_all_characteristics()
 
 if __name__ == '__main__':
     main()
