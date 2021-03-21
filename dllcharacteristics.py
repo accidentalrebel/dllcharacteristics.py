@@ -1,10 +1,17 @@
 #!/usr/bin/python3
 
 import pefile
+from argparse import ArgumentParser
 
 DYNAMIC_BASE = 0x0040
 FORCE_INTEGRITY = 0x0080
 NX_COMPAT = 0x0100
+
+parser = ArgumentParser(description='.')
+parser.add_argument('-o',
+	'--output',
+	help='Set output exe file.')
+args = parser.parse_args()
 
 pe = pefile.PE('test.exe')
 
