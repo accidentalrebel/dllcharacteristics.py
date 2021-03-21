@@ -10,40 +10,45 @@ NX_COMPAT = 0x0100
 
 pe = pefile.PE('test.exe')
 
-def get_characteristic(char_value, char_name):
+def get_characteristic(char_value):
     status = 'OFF'
     if pe.OPTIONAL_HEADER.DllCharacteristics & char_value != 0:
         status = 'ON'
 
-    print(char_name + ': ' + status)
+    return status
 
 def get_all_characteristics():
-    get_characteristic(DYNAMIC_BASE, "DYNAMIC_BASE")
-    get_characteristic(FORCE_INTEGRITY, "FORCE_INTEGRITY")
-    get_characteristic(NX_COMPAT, "NX_COMPAT")
+    print('DYNAMIC_BASE: ' + get_characteristic(DYNAMIC_BASE))
+    print('FORCE_INTEGRITY: '+ get_characteristic(FORCE_INTEGRITY))
+    print('NX_COMPAT: ' + get_characteristic(NX_COMPAT))
 
-def handle_characteristic(characteristic):
-    print('handle')
+def handle_characteristic(characteristic, arg_value):
+    if arg_value == None:
+        print(get_characteristic(characteristic))
+    elif arg_value == '1':
+        print('Setting to on...')
+    elif arg_value == '0':
+        print('Setting to off...')
 
 def main():
     parser = ArgumentParser(description='Gets or sets DLL characteristics of PE files.')
     parser.add_argument('-d',
                         '--dynamicbase',
-                        choices={'on' ,'off'},
+                        choices={'0', '1'},
                         nargs='?',
                         default='default',
                         action='store',
 	                help='Set DYNAMIC_BASE (ASLR) to value on or off. Displays current value if no parameter is specified.')
     parser.add_argument('-n',
                         '--nxcompat',
-                        choices={'on' ,'off'},
+                        choices={'0', '1'},
                         nargs='?',
                         default='default',
                         action='store',
 	                help='Set NX_COMPAT (DEP) to value on or off. Displays current value if no parameter is specified.')
     parser.add_argument('-f',
                         '--forceintegrity',
-                        choices={'on' ,'off'},
+                        choices={'0', '1'},
                         default='default',
                         nargs='?',
                         action='store',
@@ -56,12 +61,12 @@ def main():
     args = parser.parse_args()
     print(args)
 
-    if args.dynamicbase:
-        handle_characteristic(DYNAMIC_BASE)
-    elif args.nxcompat:
-        handle_characteristic(NX_COMPAT)
-    elif args.forceintegrity:
-        handle_characteristic(FORCE_INTEGRITY)
+    if args.dynamicbase != 'default':
+        handle_characteristic(DYNAMIC_BASE, args.dynamicbase)
+    elif args.nxcompat != 'default':
+        handle_characteristic(NX_COMPAT, args.nxcompat)
+    elif args.forceintegrity != 'default':
+        handle_characteristic(FORCE_INTEGRITY, args.forceintegrity)
     elif args.all:
         get_all_characteristics()
 
