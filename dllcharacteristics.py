@@ -7,16 +7,6 @@ DYNAMIC_BASE = 0x0040
 FORCE_INTEGRITY = 0x0080
 NX_COMPAT = 0x0100
 
-parser = ArgumentParser(description='Gets or sets DLL characteristics of PE files.')
-parser.add_argument('-d',
-                    '--dynamic',
-                    choices={'on' ,'off'},
-                    nargs='?',
-                    action='store',
-	            help='Set DYNAMIC_BASE (ASLR) to value on or off. Displays current value if no parameter is specified.')
-
-args = parser.parse_args()
-print(args.dynamic)
 
 pe = pefile.PE('test.exe')
 
@@ -27,7 +17,24 @@ def get_characteristic(char_value, char_name):
 
     print(char_name + ': ' + status)
 
-get_characteristic(DYNAMIC_BASE, "DYNAMIC_BASE")
-get_characteristic(FORCE_INTEGRITY, "FORCE_INTEGRITY")
-get_characteristic(NX_COMPAT, "NX_COMPAT")
+def get_all_characteristics():
+    get_characteristic(DYNAMIC_BASE, "DYNAMIC_BASE")
+    get_characteristic(FORCE_INTEGRITY, "FORCE_INTEGRITY")
+    get_characteristic(NX_COMPAT, "NX_COMPAT")
 
+def main():
+    parser = ArgumentParser(description='Gets or sets DLL characteristics of PE files.')
+    parser.add_argument('-d',
+                        '--dynamic',
+                        choices={'on' ,'off'},
+                        nargs='?',
+                        action='store',
+	                help='Set DYNAMIC_BASE (ASLR) to value on or off. Displays current value if no parameter is specified.')
+
+    args = parser.parse_args()
+    print(args.dynamic)
+
+    get_all_characteristics()
+
+if __name__ == '__main__':
+    main()
