@@ -10,10 +10,6 @@ NX_COMPAT = 0x0100
 pe = None
 is_verbose = False
 
-def print_verbose(message):
-    if is_verbose:
-        print('[INFO] ' + message)
-
 def get_characteristic_by_value(value):
     if value == 0x0040:
         return 'DYNAMIC_BASE'
@@ -23,8 +19,6 @@ def get_characteristic_by_value(value):
         return 'NX_COMPAT'
     
 def get_characteristic(char_value):
-    print_verbose('Getting characteristic for ' + get_characteristic_by_value(char_value))
-        
     status = 'OFF'
     if pe.OPTIONAL_HEADER.DllCharacteristics & char_value != 0:
         status = 'ON'
@@ -43,20 +37,16 @@ def get_all_characteristics():
     print('- FORCE_INTEGRITY: '+ get_characteristic(FORCE_INTEGRITY))
     print('- NX_COMPAT: ' + get_characteristic(NX_COMPAT))
 
-def handle_characteristic(characteristic, arg_value, output_value):
+def handle_characteristic(characteristic, arg_value):
     if arg_value == None:
-        print(get_characteristic(characteristic))
+        print('[INFO] ' + get_characteristic(characteristic))
         return
     elif arg_value == '1':
-        print('Setting to on...')
+        print('[INFO] Setting characteristic for ' + get_characteristic_by_value(characteristic) + ' to ' + str(arg_value))
         set_characteristic(characteristic, True)
     elif arg_value == '0':
-        print('Setting to off...')
+        print('[INFO] Setting characteristic for ' + get_characteristic_by_value(characteristic) + ' to ' + str(arg_value))
         set_characteristic(characteristic, False)
-
-    if output_value:
-        print('Output placeholder...')
-        pe.write(output_value)
 
 def main():
     global pe
@@ -69,20 +59,17 @@ def main():
                         '--dynamicbase',
                         choices={'0', '1'},
                         nargs='?',
-                        default='default',
                         action='store',
 	                help='Set DYNAMIC_BASE (ASLR) to value on or off. Displays current value if no parameter is specified.')
     parser.add_argument('-n',
                         '--nxcompat',
                         choices={'0', '1'},
                         nargs='?',
-                        default='default',
                         action='store',
 	                help='Set NX_COMPAT (DEP) to value on or off. Displays current value if no parameter is specified.')
     parser.add_argument('-f',
                         '--forceintegrity',
                         choices={'0', '1'},
-                        default='default',
                         nargs='?',
                         action='store',
 	                help='Set FORCE_INTEGRITY (check signaturue) to value on or off. Displays current value if no parameter is specified.')
@@ -95,20 +82,23 @@ def main():
                         help='Make output more verbose.')
 
     args = parser.parse_args()
-    print(args)
 
     is_verbose = args.verbose
 
     pe = pefile.PE(args.input)
 
-    if args.dynamicbase != 'default':
-        handle_characteristic(DYNAMIC_BASE, args.dynamicbase, args.output)
-    if  args.nxcompat != 'default':
-        handle_characteristic(NX_COMPAT, args.nxcompat, args.output)
-    if args.forceintegrity != 'default':
-        handle_characteristic(FORCE_INTEGRITY, args.forceintegrity, args.output)
-    if args.dynamicbase == 'default' and args.nxcompat == 'default' and args.forceintegrity:
+    if args.dynamicbase:
+        handle_characteristic(DYNAMIC_BASE, args.dynamicbase)
+    if  args.nxcompat:
+        handle_characteristic(NX_COMPAT, args.nxcompat)
+    if args.forceintegrity:
+        handle_characteristic(FORCE_INTEGRITY, args.forceintegrity)
+    if not args.dynamicbase and not args.nxcompat and not args.forceintegrity:
         get_all_characteristics()
+    else:
+        if args.output:
+            print('[INFO] Writing to ' + args.output)
+            pe.write(args.output)
 
 if __name__ == '__main__':
     main()
