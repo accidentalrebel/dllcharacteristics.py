@@ -3,17 +3,19 @@
 import pefile
 from argparse import ArgumentParser
 
-HIGH_ENTROPY_VA = 0x0020
-DYNAMIC_BASE = 0x0040
-FORCE_INTEGRITY = 0x0080
-NX_COMPAT = 0x0100
-NO_ISOLATION = 0x0200
-NO_SEH = 0x0400
-NO_BIND = 0x0800
-APPCONTAINER = 0x1000
-WDM_DRIVER = 0x2000
-GUARD_CF = 0x4000
-TERMINAL_SERVER_AWARE = 0x8000
+characteristics = {
+    'HIGH_ENTROPY_VA' : 0x0020,
+    'DYNAMIC_BASE' : 0x0040,
+    'FORCE_INTEGRITY' : 0x0080,
+    'NX_COMPAT' : 0x0100,
+    'NO_ISOLATION' : 0x0200,
+    'NO_SEH' : 0x0400,
+    'NO_BIND' : 0x0800,
+    'APPCONTAINER' : 0x1000,
+    'WDM_DRIVER' : 0x2000,
+    'GUARD_CF' : 0x4000,
+    'TERMINAL_SERVER_AWARE' : 0x8000
+}
 
 def get_characteristic_by_value(value):
     if value == 0x0020:
@@ -40,7 +42,7 @@ def get_characteristic_by_value(value):
         return 'TERMINAL_SERVER_AWARE'
 
 def get_value_by_name(name):
-    return eval(name.upper())
+    return characteristics[name.upper()]
     
 def get_characteristic(pe, char_value):
     status = 'OFF'
@@ -57,9 +59,8 @@ def set_characteristic(pe, char_value, status):
 
 def get_all_characteristics(pe):
     print('Characteristics: ')
-    print('- DYNAMIC_BASE: ' + get_characteristic(pe, DYNAMIC_BASE))
-    print('- FORCE_INTEGRITY: '+ get_characteristic(pe, FORCE_INTEGRITY))
-    print('- NX_COMPAT: ' + get_characteristic(pe, NX_COMPAT))
+    for c in characteristics:
+        print('- ' + c + ': ' + get_characteristic(pe, get_value_by_name(c)))
 
 def handle_characteristic(pe, characteristic, arg_value):
     if arg_value == '1':
