@@ -8,8 +8,23 @@ FORCE_INTEGRITY = 0x0080
 NX_COMPAT = 0x0100
 
 pe = None
+is_verbose = False
 
+def print_verbose(message):
+    if is_verbose:
+        print('[INFO] ' + message)
+
+def get_characteristic_by_value(value):
+    if value == 0x0040:
+        return 'DYNAMIC_BASE'
+    elif value == 0x0080:
+        return 'FORCE_INTEGRITY'
+    elif value == 0x0100:
+        return 'NX_COMPAT'
+    
 def get_characteristic(char_value):
+    print_verbose('Getting characteristic for ' + get_characteristic_by_value(char_value))
+        
     status = 'OFF'
     if pe.OPTIONAL_HEADER.DllCharacteristics & char_value != 0:
         status = 'ON'
@@ -23,9 +38,10 @@ def set_characteristic(char_value, status):
         pe.OPTIONAL_HEADER.DllCharacteristics &= ~char_value
 
 def get_all_characteristics():
-    print('DYNAMIC_BASE: ' + get_characteristic(DYNAMIC_BASE))
-    print('FORCE_INTEGRITY: '+ get_characteristic(FORCE_INTEGRITY))
-    print('NX_COMPAT: ' + get_characteristic(NX_COMPAT))
+    print('Characteristics: ')
+    print('- DYNAMIC_BASE: ' + get_characteristic(DYNAMIC_BASE))
+    print('- FORCE_INTEGRITY: '+ get_characteristic(FORCE_INTEGRITY))
+    print('- NX_COMPAT: ' + get_characteristic(NX_COMPAT))
 
 def handle_characteristic(characteristic, arg_value, output_value):
     if arg_value == None:
@@ -44,6 +60,7 @@ def handle_characteristic(characteristic, arg_value, output_value):
 
 def main():
     global pe
+    global is_verbose
     
     parser = ArgumentParser(description='Gets or sets DLL characteristics of PE files.')
     parser.add_argument('input',
@@ -69,20 +86,20 @@ def main():
                         nargs='?',
                         action='store',
 	                help='Set FORCE_INTEGRITY (check signaturue) to value on or off. Displays current value if no parameter is specified.')
-    parser.add_argument('-a',
-                        '--all',
-                        action='store_true',
-	                help='Display the values of all DLL characteristics.')
     parser.add_argument('-o',
                         '--output',
                         help='Output file to write changes to.')
+    parser.add_argument('-v',
+                        '--verbose',
+                        action='store_true',
+                        help='Make output more verbose.')
 
     args = parser.parse_args()
     print(args)
 
-    pe = pefile.PE(args.input)
+    is_verbose = args.verbose
 
-    get_all_characteristics()
+    pe = pefile.PE(args.input)
 
     if args.dynamicbase != 'default':
         handle_characteristic(DYNAMIC_BASE, args.dynamicbase, args.output)
@@ -90,10 +107,8 @@ def main():
         handle_characteristic(NX_COMPAT, args.nxcompat, args.output)
     if args.forceintegrity != 'default':
         handle_characteristic(FORCE_INTEGRITY, args.forceintegrity, args.output)
-    if args.all:
+    if args.dynamicbase == 'default' and args.nxcompat == 'default' and args.forceintegrity:
         get_all_characteristics()
-
-    get_all_characteristics()
 
 if __name__ == '__main__':
     main()
