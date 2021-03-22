@@ -38,6 +38,9 @@ def get_characteristic_by_value(value):
         return 'GUARD_CF'
     elif value == 0x8000:
         return 'TERMINAL_SERVER_AWARE'
+
+def get_value_by_name(name):
+    return eval(name.upper())
     
 def get_characteristic(pe, char_value):
     status = 'OFF'
@@ -59,10 +62,7 @@ def get_all_characteristics(pe):
     print('- NX_COMPAT: ' + get_characteristic(pe, NX_COMPAT))
 
 def handle_characteristic(pe, characteristic, arg_value):
-    if arg_value == None:
-        print('[INFO] ' + get_characteristic(pe, characteristic))
-        return
-    elif arg_value == '1':
+    if arg_value == '1':
         print('[INFO] Setting characteristic for ' + get_characteristic_by_value(characteristic) + ' to ' + str(arg_value))
         set_characteristic(pe, characteristic, True)
     elif arg_value == '0':
@@ -73,39 +73,47 @@ def main():
     parser = ArgumentParser(description='A Python tool for getting and setting the values of dll characteristics for PE files.')
     parser.add_argument('input',
                         help='The .exe file to read.')
+    parser.add_argument('-s',
+                        '--set',
+                        nargs=2,
+                        metavar=('name','value'),
+	                help='Set a specific characteristic name to a value. ')
     parser.add_argument('-d',
-                        '--dynamicbase',
+                        '--dynamic_base',
                         choices={'0', '1'},
                         nargs='?',
                         action='store',
-	                help='Set DYNAMIC_BASE (ASLR) to value on or off. Displays current value if no parameter is specified.')
+	                help='Set DYNAMIC_BASE (ASLR) to value on or off.')
     parser.add_argument('-n',
-                        '--nxcompat',
+                        '--nx_compat',
                         choices={'0', '1'},
                         nargs='?',
                         action='store',
-	                help='Set NX_COMPAT (DEP) to value on or off. Displays current value if no parameter is specified.')
+	                help='Set NX_COMPAT (DEP) to value on or off.')
     parser.add_argument('-f',
-                        '--forceintegrity',
+                        '--force_integrity',
                         choices={'0', '1'},
                         nargs='?',
                         action='store',
-	                help='Set FORCE_INTEGRITY (check signaturue) to value on or off. Displays current value if no parameter is specified.')
+	                help='Set FORCE_INTEGRITY (check signaturue) to value on or off.')
     parser.add_argument('-o',
                         '--output',
                         help='Output file to write changes to.')
 
     args = parser.parse_args()
-
+    
     pe = pefile.PE(args.input)
 
-    if args.dynamicbase:
-        handle_characteristic(pe, DYNAMIC_BASE, args.dynamicbase)
-    if  args.nxcompat:
-        handle_characteristic(pe, NX_COMPAT, args.nxcompat)
-    if args.forceintegrity:
-        handle_characteristic(pe, FORCE_INTEGRITY, args.forceintegrity)
-    if not args.dynamicbase and not args.nxcompat and not args.forceintegrity:
+    if args.set:
+        name, value = args.set
+        handle_characteristic(pe, get_value_by_name(name), value)
+    if args.dynamic_base:
+        handle_characteristic(pe, DYNAMIC_BASE, args.dynamic_base)
+    if  args.nx_compat:
+        handle_characteristic(pe, NX_COMPAT, args.nx_compat)
+    if args.force_integrity:
+        handle_characteristic(pe, FORCE_INTEGRITY, args.force_integrity)
+    if not args.dynamic_base and not args.nx_compat and not args.force_integrity and not args.set:
         get_all_characteristics(pe)
     else:
         if args.output:
