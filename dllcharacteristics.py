@@ -7,9 +7,6 @@ DYNAMIC_BASE = 0x0040
 FORCE_INTEGRITY = 0x0080
 NX_COMPAT = 0x0100
 
-pe = None
-is_verbose = False
-
 def get_characteristic_by_value(value):
     if value == 0x0040:
         return 'DYNAMIC_BASE'
@@ -18,40 +15,37 @@ def get_characteristic_by_value(value):
     elif value == 0x0100:
         return 'NX_COMPAT'
     
-def get_characteristic(char_value):
+def get_characteristic(pe, char_value):
     status = 'OFF'
     if pe.OPTIONAL_HEADER.DllCharacteristics & char_value != 0:
         status = 'ON'
 
     return status
 
-def set_characteristic(char_value, status):
+def set_characteristic(pe, char_value, status):
     if status:
         pe.OPTIONAL_HEADER.DllCharacteristics |= char_value
     else:
         pe.OPTIONAL_HEADER.DllCharacteristics &= ~char_value
 
-def get_all_characteristics():
+def get_all_characteristics(pe):
     print('Characteristics: ')
-    print('- DYNAMIC_BASE: ' + get_characteristic(DYNAMIC_BASE))
-    print('- FORCE_INTEGRITY: '+ get_characteristic(FORCE_INTEGRITY))
-    print('- NX_COMPAT: ' + get_characteristic(NX_COMPAT))
+    print('- DYNAMIC_BASE: ' + get_characteristic(pe, DYNAMIC_BASE))
+    print('- FORCE_INTEGRITY: '+ get_characteristic(pe, FORCE_INTEGRITY))
+    print('- NX_COMPAT: ' + get_characteristic(pe, NX_COMPAT))
 
-def handle_characteristic(characteristic, arg_value):
+def handle_characteristic(pe, characteristic, arg_value):
     if arg_value == None:
-        print('[INFO] ' + get_characteristic(characteristic))
+        print('[INFO] ' + get_characteristic(pe, characteristic))
         return
     elif arg_value == '1':
         print('[INFO] Setting characteristic for ' + get_characteristic_by_value(characteristic) + ' to ' + str(arg_value))
-        set_characteristic(characteristic, True)
+        set_characteristic(pe, characteristic, True)
     elif arg_value == '0':
         print('[INFO] Setting characteristic for ' + get_characteristic_by_value(characteristic) + ' to ' + str(arg_value))
-        set_characteristic(characteristic, False)
+        set_characteristic(pe, characteristic, False)
 
 def main():
-    global pe
-    global is_verbose
-    
     parser = ArgumentParser(description='Gets or sets DLL characteristics of PE files.')
     parser.add_argument('input',
                         help='The .exe file to read.')
@@ -76,25 +70,19 @@ def main():
     parser.add_argument('-o',
                         '--output',
                         help='Output file to write changes to.')
-    parser.add_argument('-v',
-                        '--verbose',
-                        action='store_true',
-                        help='Make output more verbose.')
 
     args = parser.parse_args()
-
-    is_verbose = args.verbose
 
     pe = pefile.PE(args.input)
 
     if args.dynamicbase:
-        handle_characteristic(DYNAMIC_BASE, args.dynamicbase)
+        handle_characteristic(pe, DYNAMIC_BASE, args.dynamicbase)
     if  args.nxcompat:
-        handle_characteristic(NX_COMPAT, args.nxcompat)
+        handle_characteristic(pe, NX_COMPAT, args.nxcompat)
     if args.forceintegrity:
-        handle_characteristic(FORCE_INTEGRITY, args.forceintegrity)
+        handle_characteristic(pe, FORCE_INTEGRITY, args.forceintegrity)
     if not args.dynamicbase and not args.nxcompat and not args.forceintegrity:
-        get_all_characteristics()
+        get_all_characteristics(pe)
     else:
         if args.output:
             print('[INFO] Writing to ' + args.output)
