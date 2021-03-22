@@ -46,7 +46,7 @@ def handle_characteristic(pe, characteristic, arg_value):
         set_characteristic(pe, characteristic, False)
 
 def main():
-    parser = ArgumentParser(description='Gets or sets DLL characteristics of PE files.')
+    parser = ArgumentParser(description='A Python tool for getting and setting the values of dll characteristics for PE files.')
     parser.add_argument('input',
                         help='The .exe file to read.')
     parser.add_argument('-d',
