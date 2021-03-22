@@ -41,7 +41,7 @@ def get_characteristic_by_value(value):
     elif value == 0x8000:
         return 'TERMINAL_SERVER_AWARE'
 
-def get_value_by_name(name):
+def get_flag_value_by_name(name):
     return characteristics[name.upper()]
     
 def get_characteristic(pe, char_value):
@@ -60,7 +60,7 @@ def set_characteristic(pe, char_value, status):
 def get_all_characteristics(pe):
     print('Characteristics: ')
     for c in characteristics:
-        print('- ' + c + ': ' + get_characteristic(pe, get_value_by_name(c)))
+        print('- ' + c + ': ' + get_characteristic(pe, get_flag_value_by_name(c)))
 
 def handle_characteristic(pe, characteristic, arg_value):
     if arg_value == '1':
@@ -107,13 +107,13 @@ def main():
 
     if args.set:
         name, value = args.set
-        handle_characteristic(pe, get_value_by_name(name), value)
+        handle_characteristic(pe, get_flag_value_by_name(name), value)
     if args.dynamic_base:
-        handle_characteristic(pe, DYNAMIC_BASE, args.dynamic_base)
+        handle_characteristic(pe, get_flag_value_by_name('DYNAMIC_BASE'), args.dynamic_base)
     if  args.nx_compat:
-        handle_characteristic(pe, NX_COMPAT, args.nx_compat)
+        handle_characteristic(pe, get_flag_value_by_name('NX_COMPAT'), args.nx_compat)
     if args.force_integrity:
-        handle_characteristic(pe, FORCE_INTEGRITY, args.force_integrity)
+        handle_characteristic(pe, get_flag_value_by_name('FORCE_INTEGRITY'), args.force_integrity)
     if not args.dynamic_base and not args.nx_compat and not args.force_integrity and not args.set:
         get_all_characteristics(pe)
     else:
