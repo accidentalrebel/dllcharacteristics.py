@@ -27,7 +27,7 @@ def get_all_characteristics():
     print('FORCE_INTEGRITY: '+ get_characteristic(FORCE_INTEGRITY))
     print('NX_COMPAT: ' + get_characteristic(NX_COMPAT))
 
-def handle_characteristic(characteristic, arg_value, can_output):
+def handle_characteristic(characteristic, arg_value, output_value):
     if arg_value == None:
         print(get_characteristic(characteristic))
         return
@@ -38,8 +38,9 @@ def handle_characteristic(characteristic, arg_value, can_output):
         print('Setting to off...')
         set_characteristic(characteristic, False)
 
-    if can_output:
+    if output_value:
         print('Output placeholder...')
+        pe.write(output_value)
 
 def main():
     global pe
