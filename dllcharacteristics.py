@@ -7,8 +7,7 @@ DYNAMIC_BASE = 0x0040
 FORCE_INTEGRITY = 0x0080
 NX_COMPAT = 0x0100
 
-
-pe = pefile.PE('test.exe')
+pe = None
 
 def get_characteristic(char_value):
     status = 'OFF'
@@ -43,7 +42,11 @@ def handle_characteristic(characteristic, arg_value, can_output):
         print('Output placeholder...')
 
 def main():
+    global pe
+    
     parser = ArgumentParser(description='Gets or sets DLL characteristics of PE files.')
+    parser.add_argument('input',
+                        help='The .exe file to read.')
     parser.add_argument('-d',
                         '--dynamicbase',
                         choices={'0', '1'},
@@ -75,6 +78,8 @@ def main():
 
     args = parser.parse_args()
     print(args)
+
+    pe = pefile.PE(args.input)
 
     get_all_characteristics()
 
