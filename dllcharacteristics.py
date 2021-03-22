@@ -18,28 +18,13 @@ characteristics = {
 }
 
 def get_characteristic_by_value(value):
-    if value == 0x0020:
-        return 'HIGH_ENTROPY_VA'
-    elif value == 0x0040:
-        return 'DYNAMIC_BASE'
-    elif value == 0x0080:
-        return 'FORCE_INTEGRITY'
-    elif value == 0x0100:
-        return 'NX_COMPAT'
-    elif value == 0x0200:
-        return 'NO_ISOLATION'
-    elif value == 0x0400:
-        return 'NO_SEH'
-    elif value == 0x0800:
-        return 'NO_BIND'
-    elif value == 0x1000:
-        return 'APPCONTAINER'
-    elif value == 0x2000:
-        return 'WDM_DRIVER'
-    elif value == 0x4000:
-        return 'GUARD_CF'
-    elif value == 0x8000:
-        return 'TERMINAL_SERVER_AWARE'
+    for c in characteristics:
+        flag_value = get_flag_value_by_name(c)
+        if flag_value == value:
+            return c
+
+    print('[ERROR] No characterstic is associated with value ' + value)
+    raise SystemExit(1)
 
 def get_flag_value_by_name(name):
     return characteristics[name.upper()]
