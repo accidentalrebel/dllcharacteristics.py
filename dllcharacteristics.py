@@ -48,11 +48,9 @@ def set_characteristic(pe, char_value, status):
 def get_all_characteristics(pe):
     print('Characteristics: ')
     for c in characteristics:
-        value = 'FALSE'
-        if get_characteristic(pe, get_flag_value_by_name(c)):
-            value = 'TRUE'
+        value =  get_characteristic(pe, get_flag_value_by_name(c))
             
-        print('- ' + c + ': ' + value)
+        print('- ' + str(value) + ':  ' + c)
 
 def handle_characteristic(pe, characteristic, arg_value):
     if arg_value == '1':

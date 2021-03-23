@@ -37,17 +37,17 @@ To display all characteristics and whether they are turned on or off:
 ```console
 $ ./dllcharacteristics.py test.exe
 Characteristics: 
-- HIGH_ENTROPY_VA: FALSE
-- DYNAMIC_BASE: TRUE
-- FORCE_INTEGRITY: FALSE
-- NX_COMPAT: TRUE
-- NO_ISOLATION: FALSE
-- NO_SEH: FALSE
-- NO_BIND: FALSE
-- APPCONTAINER: FALSE
-- WDM_DRIVER: FALSE
-- GUARD_CF: FALSE
-- TERMINAL_SERVER_AWARE: TRUE
+- 0:  HIGH_ENTROPY_VA
+- 1:  DYNAMIC_BASE
+- 0:  FORCE_INTEGRITY
+- 1:  NX_COMPAT
+- 0:  NO_ISOLATION
+- 0:  NO_SEH
+- 0:  NO_BIND
+- 0:  APPCONTAINER
+- 0:  WDM_DRIVER
+- 0:  GUARD_CF
+- 1:  TERMINAL_SERVER_AWARE
 ```
 
 To set the value of one specific characteristic, and then save the changes:
