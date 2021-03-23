@@ -30,22 +30,29 @@ def get_flag_value_by_name(name):
     return characteristics[name.upper()]
     
 def get_characteristic(pe, char_value):
-    status = 'OFF'
+    status = 0
     if pe.OPTIONAL_HEADER.DllCharacteristics & char_value != 0:
-        status = 'ON'
+        status = 1
 
     return status
 
 def set_characteristic(pe, char_value, status):
-    if status:
+    if status == 1:
         pe.OPTIONAL_HEADER.DllCharacteristics |= char_value
-    else:
+    elif status == 0:
         pe.OPTIONAL_HEADER.DllCharacteristics &= ~char_value
+    else:
+        print('[ERROR] Invalid status value. Should be only 0 or 1.')
+        raise SystemExit(1)
 
 def get_all_characteristics(pe):
     print('Characteristics: ')
     for c in characteristics:
-        print('- ' + c + ': ' + get_characteristic(pe, get_flag_value_by_name(c)))
+        value = 'FALSE'
+        if get_characteristic(pe, get_flag_value_by_name(c)):
+            value = 'TRUE'
+            
+        print('- ' + c + ': ' + value)
 
 def handle_characteristic(pe, characteristic, arg_value):
     if arg_value == '1':
